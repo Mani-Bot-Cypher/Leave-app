@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .error { color: red; }
+        .valid { color: green; }
+        #password-rules li::before {
+            color: red;
+        }
+        .valid::before {
+            color: green;
+        }
+    </style>
+</head>
+<body class="p-5 bg-light">
+<div class="container">
+    <div class="card shadow p-4 mx-auto" style="max-width: 500px;">
+        <h2 class="mb-4 text-center">Signup</h2>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {% for message in messages %}
+                {{ message }}<br>
+            {% endfor %}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Name:</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Phone Number:</label>
+                <input type="text" name="phone" pattern="[0-9]{10}" title="Enter a 10-digit phone number" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email:</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password:</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+
+            <ul id="password-rules" class="mb-3">
+                <li id="length">At least 8 characters</li>
+                <li id="lowercase">At least one lowercase letter</li>
+                <li id="uppercase">At least one uppercase letter</li>
+                <li id="number">At least one number</li>
+                <li id="special">At least one special character</li>
+            </ul>
+
+            <div class="mb-4">
+                <label class="form-label">Confirm Password:</label>
+                <input type="password" name="confirm_password" class="form-control" required>
+            </div>
+
+            <div class="d-grid">
+                <input type="submit" value="Signup" class="btn btn-primary">
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const passwordInput = document.getElementById("password");
+
+    passwordInput.addEventListener("input", function () {
+        const password = passwordInput.value;
+
+        document.getElementById("length").className = password.length >= 8 ? "valid" : "error";
+        document.getElementById("lowercase").className = /[a-z]/.test(password) ? "valid" : "error";
+        document.getElementById("uppercase").className = /[A-Z]/.test(password) ? "valid" : "error";
+        document.getElementById("number").className = /[0-9]/.test(password) ? "valid" : "error";
+        document.getElementById("special").className = /[^A-Za-z0-9]/.test(password) ? "valid" : "error";
+    });
+</script>
+</body>
+</html>
