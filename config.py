@@ -1,8 +1,8 @@
 import os
 
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'user': os.getenv('DB_USER', 'root'),
-    'password': os.getenv('DB_PASSWORD', ''),
-    'database': os.getenv('DB_NAME', 'leave_app_db')
+    'host': os.environ.get('DB_HOST', 'mysql'),
+    'user': os.environ.get('DB_USER', 'leaveuser'),
+    'password': os.environ.get('DB_PASSWORD', 'leavepass'),
+    'database': os.environ.get('DB_NAME', 'leave_app_db')
 }
