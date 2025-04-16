@@ -1,12 +1,18 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 import mysql.connector
-from config import DB_CONFIG
+from config import Config
+
 
 app = Flask(__name__)
 app.secret_key = 'secret_key'
 
 def get_db_connection():
-    return mysql.connector.connect(**DB_CONFIG)
+    return mysql.connector.connect(
+        host=Config.MYSQL_HOST,
+        user=Config.MYSQL_USER,
+        password=Config.MYSQL_PASSWORD,
+        database=Config.MYSQL_DATABASE
+    )
 
 @app.route('/')
 def index():
