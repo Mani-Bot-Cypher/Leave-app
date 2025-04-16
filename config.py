@@ -1,8 +1,5 @@
-# config.py
-
-DB_CONFIG = {
-    'host': 'leave-db',            # OpenShift service name for MySQL
-    'user': 'leaveuser',           # MySQL username
-    'password': 'leavepass123',    # MySQL password
-    'database': 'leavedb'          # MySQL database name
-}
+class Config:
+    MYSQL_HOST = 'leave-db'  # Name of the MySQL service in OpenShift
+    MYSQL_USER = 'leaveuser'  # from Secret
+    MYSQL_PASSWORD = 'leavepass123'  # from Secret
+    MYSQL_DATABASE = 'leavedb'  # from Secret

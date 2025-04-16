@@ -108,6 +108,40 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
+
+
+def create_tables():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100),
+            phone VARCHAR(20),
+            email VARCHAR(100) UNIQUE,
+            password VARCHAR(100),
+            role VARCHAR(10) DEFAULT 'user'
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS leave_requests (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT,
+            reason TEXT,
+            from_date DATE,
+            to_date DATE,
+            status VARCHAR(20) DEFAULT 'Pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    ''')
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
+
+create_tables()
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
 
