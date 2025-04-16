@@ -1,8 +1,8 @@
-import os
+# config.py
 
 DB_CONFIG = {
-    'host': os.environ.get('DB_HOST', 'mysql'),
-    'user': os.environ.get('DB_USER', 'leaveuser'),
-    'password': os.environ.get('DB_PASSWORD', 'leavepass'),
-    'database': os.environ.get('DB_NAME', 'leave_app_db')
+    'host': 'leave-db',            # OpenShift service name for MySQL
+    'user': 'leaveuser',           # MySQL username
+    'password': 'leavepass123',    # MySQL password
+    'database': 'leavedb'          # MySQL database name
 }
