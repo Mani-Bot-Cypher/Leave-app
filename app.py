@@ -1,17 +1,18 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash
+from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
-from config import Config
-
+import os
 
 app = Flask(__name__)
-app.secret_key = 'secret_key'
+app.secret_key = 'your_secret_key'
 
+# Function to get a new database connection
 def get_db_connection():
     return mysql.connector.connect(
-        host=Config.MYSQL_HOST,
-        user=Config.MYSQL_USER,
-        password=Config.MYSQL_PASSWORD,
-        database=Config.MYSQL_DATABASE
+        host=os.environ.get("DB_HOST", "leave"),
+        user=os.environ.get("DB_USER", "mani"),
+        password=os.environ.get("DB_PASSWORD", "1"),
+        database=os.environ.get("DB_NAME", "leave_app_db")
     )
 
 @app.route('/')
@@ -25,17 +26,18 @@ def login():
         password = request.form['password']
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute('SELECT * FROM users WHERE email=%s AND password=%s', (email, password))
+        cursor.execute('SELECT * FROM users WHERE email=%s', (email,))
         user = cursor.fetchone()
         cursor.close()
         conn.close()
-
-        if user:
+        flash(f"User: {user}", 'info')
+        if user and check_password_hash(user['password'], password):
             session['user'] = user
             flash('Logged in successfully!', 'success')
             return redirect(url_for('admin' if user['role'] == 'admin' else 'dashboard'))
         else:
             flash('Invalid email or password', 'danger')
+
     return render_template('login.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -51,11 +53,13 @@ def signup():
             flash('Passwords do not match.', 'danger')
             return redirect(url_for('signup'))
 
+        hashed_password = generate_password_hash(password)
+
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute('INSERT INTO users (name, phone, email, password, role) VALUES (%s, %s, %s, %s, %s)',
-                           (name, phone, email, password, 'user'))
+                           (name, phone, email, hashed_password, 'user'))
             conn.commit()
             cursor.close()
             conn.close()
@@ -100,7 +104,8 @@ def admin():
     cursor = conn.cursor(dictionary=True)
     cursor.execute('''
         SELECT l.id, u.name, l.reason, l.from_date, l.to_date, l.status, l.created_at 
-        FROM leave_requests l JOIN users u ON l.user_id = u.id
+        FROM leave_requests l 
+        JOIN users u ON l.user_id = u.id
         ORDER BY l.created_at DESC
     ''')
     requests = cursor.fetchall()
@@ -114,40 +119,5 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
-
-
-def create_tables():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100),
-            phone VARCHAR(20),
-            email VARCHAR(100) UNIQUE,
-            password VARCHAR(100),
-            role VARCHAR(10) DEFAULT 'user'
-        )
-    ''')
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS leave_requests (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT,
-            reason TEXT,
-            from_date DATE,
-            to_date DATE,
-            status VARCHAR(20) DEFAULT 'Pending',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    ''')
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-
-
-create_tables()
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
