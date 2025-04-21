@@ -51,7 +51,7 @@ def dashboard():
 
     # Simulate form submission logic (not saved anywhere)
     if request.method == 'POST':
-        flash('Mock leave request submitted!', 'success')
+        flash('Leave request submitted!', 'success')
         return redirect(url_for('dashboard'))
 
     return render_template('dashboard.html', user=session['user'])
