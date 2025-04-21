@@ -22,6 +22,7 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        '''
         email = request.form['email']
         password = request.form['password']
         conn = get_db_connection()
@@ -31,10 +32,11 @@ def login():
         cursor.close()
         conn.close()
         flash(f"User: {user}", 'info')
+        '''
         if True:
-            session['user'] = user
+            #session['user'] = user
             flash('Logged in successfully!', 'success')
-            return redirect(url_for('admin' if user['role'] == 'admin' else 'dashboard'))
+            return redirect(url_for('dashboard'))
         else:
             flash('Invalid email or password', 'danger')
 
@@ -76,9 +78,8 @@ def signup():
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
-    if 'user' not in session:
+    '''if 'user' not in session:
         return redirect(url_for('login'))
-
     if request.method == 'POST':
         reason = request.form['reason']
         from_date = request.form['from_date']
@@ -92,6 +93,7 @@ def dashboard():
         conn.close()
         flash('Leave request submitted successfully!', 'success')
         return redirect(url_for('dashboard'))
+        '''
 
     return render_template('dashboard.html', user=session['user'])
 
